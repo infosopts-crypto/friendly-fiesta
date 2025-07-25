@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(142, 76%, 36%);
+  --primary-foreground: hsl(355, 7%, 97%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+
+  /* Men's theme colors */
+  --men-primary: hsl(142, 76%, 36%);
+  --men-secondary: hsl(142, 72%, 29%);
+  --men-beige: hsl(60, 29%, 93%);
+
+  /* Women's theme colors */
+  --women-primary: hsl(327, 73%, 57%);
+  --women-secondary: hsl(327, 78%, 49%);
+  --women-beige: hsl(60, 29%, 93%);
+
+  /* Islamic colors */
+  --islamic-gold: hsl(45, 71%, 45%);
+  --quran-bg: hsl(53, 78%, 97%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(142, 76%, 36%);
+  --primary-foreground: hsl(355, 7%, 97%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+}
+
+/* Men's theme */
+.men-theme {
+  --primary: var(--men-primary);
+  --primary-foreground: hsl(0, 0%, 100%);
+}
+
+/* Women's theme */
+.women-theme {
+  --primary: var(--women-primary);
+  --primary-foreground: hsl(0, 0%, 100%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', 'Noto Sans Arabic', sans-serif;
+    direction: rtl;
+  }
+
+  /* Arabic typography */
+  .arabic-text {
+    font-family: 'Noto Sans Arabic', sans-serif;
+    direction: rtl;
+    text-align: right;
+  }
+
+  .quran-text {
+    font-family: 'Amiri', 'Noto Sans Arabic', serif;
+    line-height: 2;
+    font-size: 1.2rem;
+    direction: rtl;
+    text-align: center;
+  }
+
+  /* Error highlighting styles */
+  .error-highlight-red {
+    background-color: hsla(0, 84%, 60%, 0.3);
+    border-radius: 3px;
+    padding: 1px 2px;
+  }
+
+  .error-highlight-yellow {
+    background-color: hsla(45, 93%, 58%, 0.3);
+    border-radius: 3px;
+    padding: 1px 2px;
+  }
+
+  /* RTL fixes */
+  .rtl-flip {
+    transform: scaleX(-1);
+  }
+
+  /* Custom scrollbar for RTL */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Form input styles for Arabic */
+  input[type="text"],
+  input[type="number"],
+  input[type="tel"],
+  textarea,
+  select {
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* Placeholder text alignment for RTL */
+  input::placeholder,
+  textarea::placeholder {
+    text-align: right;
+    opacity: 0.6;
+  }
+}
+
+@layer components {
+  /* Utility classes for themes */
+  .men-primary {
+    background-color: var(--men-primary);
+    color: white;
+  }
+
+  .men-secondary {
+    background-color: var(--men-secondary);
+    color: white;
+  }
+
+  .women-primary {
+    background-color: var(--women-primary);
+    color: white;
+  }
+
+  .women-secondary {
+    background-color: var(--women-secondary);
+    color: white;
+  }
+
+  .beige-bg {
+    background-color: var(--men-beige);
+  }
+
+  .islamic-gold {
+    color: var(--islamic-gold);
+  }
+
+  .quran-bg {
+    background-color: var(--quran-bg);
+  }
+}
+
+/* Import Arabic fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap');
