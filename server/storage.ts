@@ -1,5 +1,6 @@
 import { type Teacher, type InsertTeacher, type Student, type InsertStudent, type DailyRecord, type InsertDailyRecord, type QuranError, type InsertQuranError } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { DatabaseStorage } from "./db";
 
 export interface IStorage {
   // Teachers
@@ -220,4 +221,7 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// استخدام قاعدة البيانات الحقيقية بدلاً من الذاكرة المؤقتة
+export const storage = process.env.NODE_ENV === 'development' && !process.env.DATABASE_URL 
+  ? new MemStorage() 
+  : new DatabaseStorage();
