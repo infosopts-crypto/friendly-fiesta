@@ -29,8 +29,9 @@ The application follows a modern full-stack architecture with clear separation b
 
 ### Data Storage Architecture
 - **ORM**: Drizzle ORM with PostgreSQL dialect
-- **Database**: PostgreSQL (configured via DATABASE_URL)
+- **Database**: Supabase PostgreSQL (configured via DATABASE_URL)
 - **Migrations**: Drizzle Kit for schema management
+- **Cloud Database**: Supabase for production-ready database hosting
 - **Development Storage**: In-memory storage implementation for development/testing
 
 ## Key Components
