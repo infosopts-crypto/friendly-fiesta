@@ -51,6 +51,8 @@ The application follows a modern full-stack architecture with clear separation b
 - **Populated system with sample students** across male and female circles
 - **Added developer footer** with attribution to عبدالله بن محمد and Telegram link
 - **Complete system ready for deployment** with full Arabic RTL support
+- **Fixed deployment configuration** with proper build scripts and deployment guides
+- **Created deployment workarounds** for static file serving mismatch between Vite and Express
 
 ### Student Management
 - CRUD operations for student records
@@ -129,8 +131,30 @@ The application follows a modern full-stack architecture with clear separation b
 - Migration files generated in `./migrations` directory
 
 ### Static Asset Serving
-- Production: Express serves static files from `dist/public`
+- Production: Express serves static files from `server/public` 
 - Development: Vite middleware handles asset serving
 - Vite configuration handles path resolution and aliases
+- **Current Issue**: Vite outputs to `dist/public` but server expects `server/public`
+
+### Deployment Options & Fixes
+
+#### Option 1: Autoscale Deployment (Recommended)
+This is the recommended approach for the full-stack application:
+1. **Deployment Type**: Autoscale 
+2. **Build Command**: `npm run build`
+3. **Start Command**: `npm start`
+4. **Workaround**: Run `node scripts/prepare-production.js` after build to copy static files to correct location
+
+#### Option 2: Static Deployment
+For frontend-only deployment (no API endpoints):
+1. **Deployment Type**: Static
+2. **Public Directory**: `dist/public`
+3. **Build Command**: `vite build`
+4. **Alternative**: Use `node scripts/build-for-static.js` to copy files to `dist/` root
+
+#### Deployment Scripts Created
+- `scripts/prepare-production.js`: Copies `dist/public/*` to `server/public/` for autoscale deployment
+- `scripts/build-for-static.js`: Copies `dist/public/*` to `dist/` for static deployment
+- `deployment-guide.md`: Comprehensive deployment documentation
 
 The application is designed to be deployed on platforms supporting Node.js with PostgreSQL databases, with specific optimizations for Replit's environment during development.
