@@ -1,44 +1,77 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, BookOpen } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { getCompleteQuran, getSurah, searchVerses, surahNames, type QuranSurah, type QuranVerse } from "@/lib/quran-api";
 import type { Student, QuranError, InsertQuranError } from "@shared/schema";
 
 interface QuranViewerProps {
   students: Student[];
 }
 
-const surahs = [
-  { name: "الفاتحة", pages: [1, 2] },
-  { name: "البقرة", pages: [2, 49] },
-  { name: "آل عمران", pages: [50, 76] },
-  { name: "النساء", pages: [77, 106] },
-  // Add more surahs as needed
-];
-
-const sampleVerses = [
-  { number: 8, text: "وَمِنَ النَّاسِ مَن يَقُولُ آمَنَّا بِاللَّهِ وَبِالْيَوْمِ الْآخِرِ وَمَا هُم بِمُؤْمِنِينَ" },
-  { number: 9, text: "يُخَادِعُونَ اللَّهَ وَالَّذِينَ آمَنُوا وَمَا يَخْدَعُونَ إِلَّا أَنفُسَهُمْ وَمَا يَشْعُرُونَ" },
-  { number: 10, text: "فِي قُلُوبِهِم مَّرَضٌ فَزَادَهُمُ اللَّهُ مَرَضًا ۖ وَلَهُم عَذَابٌ أَلِيمٌ بِمَا كَانُوا يَكْذِبُونَ" },
-  { number: 11, text: "وَإِذَا قِيلَ لَهُمْ لَا تُفْسِدُوا فِي الْأَرْضِ قَالُوا إِنَّمَا نَحْنُ مُصْلِحُونَ" },
-  { number: 12, text: "أَلَا إِنَّهُمْ هُمُ الْمُفْسِدُونَ وَلَٰكِن لَّا يَشْعُرُونَ" },
-];
-
 export default function QuranViewer({ students }: QuranViewerProps) {
-  const [selectedSurah, setSelectedSurah] = useState("البقرة");
-  const [currentPage, setCurrentPage] = useState(2);
+  const [selectedSurahNumber, setSelectedSurahNumber] = useState(2); // البقرة
   const [selectedStudent, setSelectedStudent] = useState<string>("");
   const [highlightMode, setHighlightMode] = useState<"repeated" | "previous" | null>(null);
   const [highlightedVerses, setHighlightedVerses] = useState<Record<number, "repeated" | "previous">>({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<QuranVerse[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [currentSurah, setCurrentSurah] = useState<QuranSurah | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Load selected surah
+  useEffect(() => {
+    const loadSurah = async () => {
+      setIsLoading(true);
+      try {
+        const surah = await getSurah(selectedSurahNumber);
+        setCurrentSurah(surah);
+      } catch (error) {
+        toast({
+          title: "خطأ في التحميل",
+          description: "فشل في تحميل السورة",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSurah();
+  }, [selectedSurahNumber, toast]);
+
+  // Search functionality
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setIsSearching(true);
+    try {
+      const results = await searchVerses(searchQuery);
+      setSearchResults(results);
+      toast({
+        title: "البحث مكتمل",
+        description: `تم العثور على ${results.length} آية`,
+      });
+    } catch (error) {
+      toast({
+        title: "خطأ في البحث",
+        description: "فشل في البحث عن الآيات",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const { data: quranErrors = [] } = useQuery<QuranError[]>({
     queryKey: ["/api/students", selectedStudent, "quran-errors"],
@@ -81,7 +114,7 @@ export default function QuranViewer({ students }: QuranViewerProps) {
   });
 
   const handleVerseClick = useCallback((verseNumber: number) => {
-    if (!selectedStudent || !highlightMode) {
+    if (!selectedStudent || !highlightMode || !currentSurah) {
       toast({
         title: "تنبيه",
         description: "يرجى اختيار طالب ونوع التمييز أولاً",
@@ -92,7 +125,7 @@ export default function QuranViewer({ students }: QuranViewerProps) {
 
     // Check if verse already has error
     const existingError = quranErrors.find(
-      error => error.verse === verseNumber && error.pageNumber === currentPage
+      error => error.verse === verseNumber && error.surah === currentSurah.name
     );
 
     if (existingError) {
@@ -107,9 +140,9 @@ export default function QuranViewer({ students }: QuranViewerProps) {
       // Add new error
       createErrorMutation.mutate({
         studentId: selectedStudent,
-        surah: selectedSurah,
+        surah: currentSurah.name,
         verse: verseNumber,
-        pageNumber: currentPage,
+        pageNumber: 1, // Default page for now
         errorType: highlightMode,
       });
       setHighlightedVerses(prev => ({
@@ -117,20 +150,24 @@ export default function QuranViewer({ students }: QuranViewerProps) {
         [verseNumber]: highlightMode,
       }));
     }
-  }, [selectedStudent, highlightMode, currentPage, selectedSurah, quranErrors, createErrorMutation, deleteErrorMutation, toast]);
+  }, [selectedStudent, highlightMode, currentSurah, quranErrors, createErrorMutation, deleteErrorMutation, toast]);
 
   const clearAllHighlights = () => {
-    // Delete all errors for current page
-    const pageErrors = quranErrors.filter(error => error.pageNumber === currentPage);
-    pageErrors.forEach(error => {
+    if (!currentSurah) return;
+    
+    // Delete all errors for current surah
+    const surahErrors = quranErrors.filter(error => error.surah === currentSurah.name);
+    surahErrors.forEach(error => {
       deleteErrorMutation.mutate(error.id);
     });
     setHighlightedVerses({});
   };
 
   const getVerseClassName = (verseNumber: number) => {
+    if (!currentSurah) return "hover:bg-gray-100 cursor-pointer transition-colors px-1 rounded inline-block";
+    
     const error = quranErrors.find(
-      error => error.verse === verseNumber && error.pageNumber === currentPage
+      error => error.verse === verseNumber && error.surah === currentSurah.name
     );
     
     let baseClass = "hover:bg-gray-100 cursor-pointer transition-colors px-1 rounded inline-block";
@@ -146,22 +183,68 @@ export default function QuranViewer({ students }: QuranViewerProps) {
     return baseClass;
   };
 
-  const nextPage = () => {
-    if (currentPage < 604) {
-      setCurrentPage(prev => prev + 1);
+  const nextSurah = () => {
+    if (selectedSurahNumber < 114) {
+      setSelectedSurahNumber(prev => prev + 1);
       setHighlightedVerses({});
     }
   };
 
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
+  const prevSurah = () => {
+    if (selectedSurahNumber > 1) {
+      setSelectedSurahNumber(prev => prev - 1);
       setHighlightedVerses({});
     }
   };
 
   return (
     <div className="space-y-6">
+      {/* Search Section */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <Label htmlFor="search">البحث في القرآن</Label>
+              <div className="flex gap-2 mt-1">
+                <Input
+                  id="search"
+                  placeholder="ابحث عن آية..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  className="flex-1"
+                />
+                <Button onClick={handleSearch} disabled={isSearching}>
+                  <Search className="ml-2" size={16} />
+                  {isSearching ? "جاري البحث..." : "بحث"}
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          {searchResults.length > 0 && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-semibold mb-2">نتائج البحث ({searchResults.length}):</h4>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {searchResults.slice(0, 5).map((verse, index) => (
+                  <div key={index} className="text-sm p-2 bg-white rounded border">
+                    <p className="text-right">{verse.text}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      سورة {verse.surah.name} - آية {verse.number}
+                    </p>
+                  </div>
+                ))}
+                {searchResults.length > 5 && (
+                  <p className="text-xs text-gray-500 text-center">
+                    وعثر على {searchResults.length - 5} نتيجة أخرى...
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Quran Controls */}
       <Card>
         <CardContent className="p-6">
@@ -169,32 +252,18 @@ export default function QuranViewer({ students }: QuranViewerProps) {
             <div className="flex items-center gap-4">
               <div>
                 <Label htmlFor="surah">السورة</Label>
-                <Select value={selectedSurah} onValueChange={setSelectedSurah}>
+                <Select value={selectedSurahNumber.toString()} onValueChange={(value) => setSelectedSurahNumber(parseInt(value))}>
                   <SelectTrigger className="w-48" data-testid="select-surah">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {surahs.map(surah => (
-                      <SelectItem key={surah.name} value={surah.name}>
-                        {surah.name}
+                    {surahNames.map((name, index) => (
+                      <SelectItem key={index + 1} value={(index + 1).toString()}>
+                        {index + 1}. {name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="page">الصفحة</Label>
-                <Input
-                  id="page"
-                  type="number"
-                  min="1"
-                  max="604"
-                  value={currentPage}
-                  onChange={(e) => setCurrentPage(parseInt(e.target.value) || 1)}
-                  className="w-20 text-center"
-                  data-testid="input-page-number"
-                />
               </div>
 
               <div>
@@ -251,52 +320,69 @@ export default function QuranViewer({ students }: QuranViewerProps) {
       {/* Quran Display */}
       <Card className="quran-bg">
         <CardContent className="p-8">
-          <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">سورة {selectedSurah}</h3>
-            <p className="text-gray-600">الصفحة {currentPage}</p>
-          </div>
-          
-          <div className="quran-text text-center leading-loose space-y-4" data-testid="quran-content">
-            {sampleVerses.map((verse) => (
-              <p key={verse.number} className="mb-4">
-                <span
-                  className={getVerseClassName(verse.number)}
-                  onClick={() => handleVerseClick(verse.number)}
-                  data-testid={`verse-${verse.number}`}
-                >
-                  {verse.text}
-                </span>
-                <span className="islamic-gold mr-2">({verse.number})</span>
-              </p>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-12">
+              <BookOpen className="mx-auto mb-4 animate-pulse" size={48} />
+              <p className="text-gray-600">جاري تحميل السورة...</p>
+            </div>
+          ) : currentSurah ? (
+            <>
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                  سورة {currentSurah.name}
+                </h3>
+                <p className="text-gray-600">
+                  {currentSurah.numberOfAyahs} آية - {currentSurah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}
+                </p>
+              </div>
+              
+              <div className="quran-text text-right leading-loose space-y-4" data-testid="quran-content" dir="rtl">
+                {currentSurah.ayahs.map((verse) => (
+                  <p key={verse.number} className="mb-4 text-xl">
+                    <span
+                      className={getVerseClassName(verse.number)}
+                      onClick={() => handleVerseClick(verse.number)}
+                      data-testid={`verse-${verse.number}`}
+                    >
+                      {verse.text}
+                    </span>
+                    <span className="islamic-gold mr-2 text-base">﴿{verse.number}﴾</span>
+                  </p>
+                ))}
+              </div>
 
-          {/* Navigation */}
-          <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-            <Button
-              variant="ghost"
-              onClick={prevPage}
-              disabled={currentPage === 1}
-              className="flex items-center"
-              data-testid="button-prev-page"
-            >
-              <ChevronRight className="ml-2" size={18} />
-              الصفحة السابقة
-            </Button>
-            <span className="text-gray-600 text-sm" data-testid="text-page-info">
-              صفحة {currentPage} من 604
-            </span>
-            <Button
-              variant="ghost"
-              onClick={nextPage}
-              disabled={currentPage === 604}
-              className="flex items-center"
-              data-testid="button-next-page"
-            >
-              الصفحة التالية
-              <ChevronLeft className="mr-2" size={18} />
-            </Button>
-          </div>
+              {/* Navigation */}
+              <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                <Button
+                  variant="ghost"
+                  onClick={prevSurah}
+                  disabled={selectedSurahNumber === 1}
+                  className="flex items-center"
+                  data-testid="button-prev-surah"
+                >
+                  <ChevronRight className="ml-2" size={18} />
+                  السورة السابقة
+                </Button>
+                <span className="text-gray-600 text-sm" data-testid="text-surah-info">
+                  سورة {selectedSurahNumber} من 114
+                </span>
+                <Button
+                  variant="ghost"
+                  onClick={nextSurah}
+                  disabled={selectedSurahNumber === 114}
+                  className="flex items-center"
+                  data-testid="button-next-surah"
+                >
+                  السورة التالية
+                  <ChevronLeft className="mr-2" size={18} />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-red-600">فشل في تحميل السورة</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
