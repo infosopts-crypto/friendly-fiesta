@@ -22,6 +22,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/auth/validate", async (req, res) => {
+    try {
+      const { username, password } = loginSchema.parse(req.body);
+      const teacher = await storage.validateTeacher(username, password);
+      
+      if (!teacher) {
+        return res.status(401).json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
+      }
+
+      // Return teacher data without password
+      const { password: _, ...teacherData } = teacher;
+      res.json(teacherData);
+    } catch (error) {
+      res.status(400).json({ message: "بيانات غير صالحة" });
+    }
+  });
+
+  // Get all teachers (for testing and parent portal)
+  app.get("/api/teachers", async (req, res) => {
+    try {
+      const teachers = await storage.getTeachers();
+      // Remove passwords from response
+      const safeTeachers = teachers.map((teacher: any) => {
+        const { password, ...safeTeacher } = teacher;
+        return safeTeacher;
+      });
+      res.json(safeTeachers);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في جلب بيانات المعلمين" });
+    }
+  });
+
+  // Get all students (for parent portal)
+  app.get("/api/students", async (req, res) => {
+    try {
+      const students = await storage.getAllStudents();
+      res.json(students);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في جلب بيانات الطلاب" });
+    }
+  });
+
   // Students
   app.get("/api/teachers/:teacherId/students", async (req, res) => {
     try {

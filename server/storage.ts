@@ -93,6 +93,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.teachers.values()).find(teacher => teacher.username === username);
   }
 
+  async getTeachers(): Promise<Teacher[]> {
+    return Array.from(this.teachers.values());
+  }
+
   async createTeacher(insertTeacher: InsertTeacher): Promise<Teacher> {
     const id = randomUUID();
     const teacher: Teacher = { 
