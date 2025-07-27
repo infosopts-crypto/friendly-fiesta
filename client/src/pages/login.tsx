@@ -62,41 +62,41 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-pink-50">
-      <div className="max-w-md w-full mx-4">
-        <Card className="shadow-xl">
-          <CardHeader className="text-center space-y-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-pink-500 rounded-full mx-auto flex items-center justify-center">
-              <BookOpen className="text-white text-2xl" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-pink-50 mobile-container">
+      <div className="max-w-md w-full mx-auto">
+        <Card className="mobile-card shadow-xl border-0">
+          <CardHeader className="text-center space-y-4 px-4 sm:px-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-500 to-pink-500 rounded-full mx-auto flex items-center justify-center">
+              <BookOpen className="text-white text-xl sm:text-2xl" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800 mb-2">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 leading-tight">
                 نظام إدارة حلقات التحفيظ
               </h1>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed px-2">
                 جامع الرويشد - نظام إدارة حلقات تحفيظ القرآن الكريم
               </p>
             </div>
           </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="px-4 sm:px-6 pb-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="username">اسم المستخدم</Label>
+                <Label htmlFor="username" className="text-sm sm:text-base">اسم المستخدم</Label>
                 <Input
                   id="username"
                   type="text"
                   placeholder="أدخل اسم المستخدم"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="text-right"
+                  className="mobile-input text-right"
                   disabled={isLoading}
                   data-testid="input-username"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">كلمة المرور</Label>
+                <Label htmlFor="password" className="text-sm sm:text-base">كلمة المرور</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -104,13 +104,13 @@ export default function Login() {
                     placeholder="أدخل كلمة المرور"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="text-right pl-10"
+                    className="mobile-input text-right pl-10"
                     disabled={isLoading}
                     data-testid="input-password"
                   />
                   <button
                     type="button"
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 touch-target"
                     onClick={() => setShowPassword(!showPassword)}
                     data-testid="button-toggle-password"
                   >
@@ -142,7 +142,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-green-500 to-pink-500 hover:from-green-600 hover:to-pink-600 text-white"
+                className="mobile-button w-full bg-gradient-to-r from-green-500 to-pink-500 hover:from-green-600 hover:to-pink-600 text-white"
                 disabled={isLoading}
                 data-testid="button-login"
               >

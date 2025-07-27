@@ -91,39 +91,85 @@ export default function Dashboard() {
 
   return (
     <div className={`min-h-screen bg-gray-50 ${themeClass}`}>
-      {/* Navigation Header */}
+      {/* Navigation Header - Mobile Responsive */}
       <nav className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center">
-              <div className={`w-10 h-10 ${primaryColor} rounded-lg flex items-center justify-center ml-3`}>
-                <BookOpen className="text-white" size={20} />
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 ${primaryColor} rounded-lg flex items-center justify-center ml-2 sm:ml-3`}>
+                <BookOpen className="text-white" size={16} />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900" data-testid="text-teacher-name">
+                <h1 className="text-base sm:text-lg font-semibold text-gray-900 leading-tight" data-testid="text-teacher-name">
                   {teacher.name}
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs sm:text-sm text-gray-500">
                   {isWomen ? "حلقات النساء" : "حلقات الرجال"}
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4 space-x-reverse">
-              <Button variant="ghost" size="sm" data-testid="button-notifications">
-                <Bell size={18} />
+            <div className="flex items-center space-x-3 space-x-reverse">
+              <Button variant="ghost" size="sm" className="touch-target" data-testid="button-notifications">
+                <Bell size={16} />
               </Button>
-              <Button variant="ghost" size="sm" onClick={handleLogout} data-testid="button-logout">
-                <LogOut size={18} />
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="touch-target" data-testid="button-logout">
+                <LogOut size={16} />
               </Button>
             </div>
           </div>
         </div>
       </nav>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-sm h-screen sticky top-0">
+      <div className="flex flex-col lg:flex-row">
+        {/* Mobile Navigation Tabs */}
+        <div className="lg:hidden bg-white border-b">
+          <div className="flex overflow-x-auto scrollbar-hide">
+            <button
+              className={`flex-shrink-0 px-4 py-3 text-sm font-medium ${activeTab === "overview" ? `${accentColor} border-b-2 border-current` : "text-gray-500"}`}
+              onClick={() => setActiveTab("overview")}
+              data-testid="tab-overview"
+            >
+              <ChartPie size={16} className="ml-2" />
+              عامة
+            </button>
+            <button
+              className={`flex-shrink-0 px-4 py-3 text-sm font-medium ${activeTab === "students" ? `${accentColor} border-b-2 border-current` : "text-gray-500"}`}
+              onClick={() => setActiveTab("students")}
+              data-testid="tab-students"
+            >
+              <Users size={16} className="ml-2" />
+              الطلاب
+            </button>
+            <button
+              className={`flex-shrink-0 px-4 py-3 text-sm font-medium ${activeTab === "records" ? `${accentColor} border-b-2 border-current` : "text-gray-500"}`}
+              onClick={() => setActiveTab("records")}
+              data-testid="tab-records"
+            >
+              <ClipboardList size={16} className="ml-2" />
+              السجلات
+            </button>
+            <button
+              className={`flex-shrink-0 px-4 py-3 text-sm font-medium ${activeTab === "quran" ? `${accentColor} border-b-2 border-current` : "text-gray-500"}`}
+              onClick={() => setActiveTab("quran")}
+              data-testid="tab-quran"
+            >
+              <BookOpen size={16} className="ml-2" />
+              القرآن
+            </button>
+            <button
+              className={`flex-shrink-0 px-4 py-3 text-sm font-medium ${activeTab === "reports" ? `${accentColor} border-b-2 border-current` : "text-gray-500"}`}
+              onClick={() => setActiveTab("reports")}
+              data-testid="tab-reports"
+            >
+              <FileText size={16} className="ml-2" />
+              التقارير
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop Sidebar */}
+        <div className="hidden lg:block w-64 bg-white shadow-sm h-screen sticky top-0">
           <div className="p-6">
             <nav className="space-y-2">
               <Button
@@ -175,47 +221,47 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 p-6">
+        {/* Main Content - Mobile Responsive */}
+        <div className="flex-1 mobile-container lg:p-6">
           {/* Overview Tab */}
           {activeTab === "overview" && (
             <div>
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">نظرة عامة</h2>
-                <p className="text-gray-600">
+              <div className="mb-6 sm:mb-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">نظرة عامة</h2>
+                <p className="text-gray-600 text-sm sm:text-base">
                   مرحباً بك {teacher.name}، إليك ملخص حلقتك اليوم
                 </p>
               </div>
 
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <Card>
-                  <CardContent className="p-6">
+              {/* Stats Cards - Mobile Responsive Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+                <Card className="mobile-card">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">إجمالي الطلاب</p>
-                        <p className="text-2xl font-bold text-gray-900" data-testid="stat-total-students">
+                        <p className="text-xs sm:text-sm font-medium text-gray-600">إجمالي الطلاب</p>
+                        <p className="text-lg sm:text-2xl font-bold text-gray-900" data-testid="stat-total-students">
                           {statsData.totalStudents}
                         </p>
                       </div>
-                      <div className={`w-12 h-12 ${primaryColor} bg-opacity-10 rounded-lg flex items-center justify-center`}>
-                        <Users className={accentColor} size={20} />
+                      <div className={`w-8 h-8 sm:w-12 sm:h-12 ${primaryColor} bg-opacity-10 rounded-lg flex items-center justify-center`}>
+                        <Users className={accentColor} size={16} />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardContent className="p-6">
+                <Card className="mobile-card">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">حضروا اليوم</p>
-                        <p className="text-2xl font-bold text-gray-900" data-testid="stat-attended-today">
+                        <p className="text-xs sm:text-sm font-medium text-gray-600">حضروا اليوم</p>
+                        <p className="text-lg sm:text-2xl font-bold text-gray-900" data-testid="stat-attended-today">
                           {statsData.attendedToday}
                         </p>
                       </div>
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Check className="text-green-600" size={20} />
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <Check className="text-green-600" size={16} />
                       </div>
                     </div>
                   </CardContent>
