@@ -529,6 +529,26 @@ export default function Dashboard() {
         teacherId={teacher.id}
         student={editingStudent}
       />
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-6 mt-12">
+        <div className="max-w-7xl mx-auto px-6 text-center space-y-2">
+          <p className="text-gray-300 text-sm">
+            © 2025 جامع الرويشد - نظام إدارة حلقات تحفيظ القرآن الكريم
+          </p>
+          <p className="text-gray-400 text-xs">
+            صُنع بواسطة{" "}
+            <a 
+              href="https://t.me/rnp_e" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              عبدالله بن محمد
+            </a>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

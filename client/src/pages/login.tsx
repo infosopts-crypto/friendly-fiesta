@@ -150,9 +150,20 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-8 text-center">
+            <div className="mt-8 text-center space-y-2">
               <p className="text-xs text-gray-500">
-                © 2024 نظام إدارة حلقات تحفيظ القرآن الكريم
+                © 2025 جامع الرويشد - نظام إدارة حلقات تحفيظ القرآن الكريم
+              </p>
+              <p className="text-xs text-gray-400">
+                صُنع بواسطة{" "}
+                <a 
+                  href="https://t.me/rnp_e" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:text-blue-400 transition-colors"
+                >
+                  عبدالله بن محمد
+                </a>
               </p>
             </div>
           </CardContent>
