@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, Eye, EyeOff } from "lucide-react";
+import { BookOpen, Eye, EyeOff, UserCheck, Users } from "lucide-react";
 import { useAuth } from "@/lib/auth.tsx";
 import { apiRequest } from "@/lib/queryClient";
 import type { LoginData } from "@shared/schema";
@@ -15,6 +16,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [userType, setUserType] = useState<"teacher" | "parent">("teacher");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,17 +41,23 @@ export default function Login() {
       const response = await apiRequest("POST", "/api/auth/login", {
         username: username.trim(),
         password: password.trim(),
-      } as LoginData);
-
-      const teacher = await response.json();
-      login(teacher);
-      
-      toast({
-        title: "تم تسجيل الدخول بنجاح",
-        description: `مرحباً بك ${teacher.name}`,
+        userType,
       });
 
-      setLocation("/dashboard");
+      const userData = await response.json();
+      login(userData);
+      
+      const displayName = userType === "teacher" ? userData.name : userData.fatherName;
+      toast({
+        title: "تم تسجيل الدخول بنجاح",
+        description: `مرحباً بك ${displayName}`,
+      });
+
+      if (userType === "parent") {
+        setLocation("/parent-dashboard");
+      } else {
+        setLocation("/dashboard");
+      }
     } catch (error) {
       toast({
         title: "خطأ في تسجيل الدخول",
@@ -74,13 +82,37 @@ export default function Login() {
                 نظام إدارة حلقات التحفيظ
               </h1>
               <p className="text-gray-600">
-                مرحباً بك في نظام إدارة حلقات تحفيظ القرآن الكريم
+                جامع الرويشد - نظام إدارة حلقات تحفيظ القرآن الكريم
               </p>
             </div>
           </CardHeader>
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-3">
+                <Label>نوع المستخدم</Label>
+                <RadioGroup 
+                  value={userType} 
+                  onValueChange={(value: "teacher" | "parent") => setUserType(value)}
+                  className="flex space-x-6 space-x-reverse justify-center"
+                >
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="teacher" id="teacher" />
+                    <Label htmlFor="teacher" className="flex items-center space-x-2 space-x-reverse cursor-pointer">
+                      <UserCheck size={18} />
+                      <span>معلم</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="parent" id="parent" />
+                    <Label htmlFor="parent" className="flex items-center space-x-2 space-x-reverse cursor-pointer">
+                      <Users size={18} />
+                      <span>ولي أمر</span>
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="username">اسم المستخدم</Label>
                 <Input

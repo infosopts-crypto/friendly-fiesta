@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a comprehensive web application for managing Quran memorization circles (حلقات القرآن) built with modern web technologies. The system allows teachers to track student progress, record daily memorization activities, manage Quran recitation errors, and generate reports. It supports both men's and women's circles with appropriate theming and Arabic language support.
+This is a comprehensive web application for managing Quran memorization circles (حلقات القرآن) built for Jamae Al-Ruwaishid (جامع الرويشد). The system supports two main user types: teachers who manage students and track progress, and parents who can view their children's evaluations and records. It features gender-separated learning environments for male and female students with appropriate theming and full Arabic RTL language support.
 
 ## User Preferences
 
@@ -38,11 +38,18 @@ The application follows a modern full-stack architecture with clear separation b
 ## Key Components
 
 ### Authentication System
-- Simple username/password authentication
-- Teacher-specific login with role-based access
+- Dual authentication system supporting teachers and parents
+- Role-based access control with user type selection
 - Gender-based theming (men's vs women's circles)
 - Session persistence via localStorage
-- Demo credentials for development testing
+- Secure credential management for both user types
+
+### Parent Portal System (NEW)
+- Dedicated parent dashboard for monitoring children's progress
+- Real-time synchronization with teacher records
+- Multi-child support for families with multiple students
+- Comprehensive statistics and performance analytics
+- Recent activity tracking and behavioral assessments
 
 ### Student Management
 - CRUD operations for student records
