@@ -80,40 +80,7 @@ export class MemStorage implements IStorage {
       this.teachers.set(teacher.id, teacher);
     });
 
-    // Sample students
-    const teachersArray = Array.from(this.teachers.values());
-    
-    if (teachersArray.length > 0) {
-      const sampleStudents = [
-        { name: "عبدالله أحمد", age: 8, level: "beginner", teacherGender: "male" },
-        { name: "فاطمة أحمد", age: 10, level: "intermediate", teacherGender: "female" },
-        { name: "محمد عبدالله", age: 12, level: "advanced", teacherGender: "male" },
-        { name: "عائشة محمد", age: 9, level: "beginner", teacherGender: "female" },
-        { name: "علي حسن", age: 11, level: "intermediate", teacherGender: "male" },
-        { name: "خديجة علي", age: 7, level: "beginner", teacherGender: "female" },
-        { name: "يوسف إبراهيم", age: 13, level: "advanced", teacherGender: "male" },
-        { name: "زينب يوسف", age: 8, level: "beginner", teacherGender: "female" },
-        { name: "عبدالرحمن صالح", age: 10, level: "intermediate", teacherGender: "male" },
-      ];
-
-      sampleStudents.forEach(studentData => {
-        const availableTeachers = teachersArray.filter(t => t.gender === studentData.teacherGender);
-        const randomTeacher = availableTeachers[Math.floor(Math.random() * availableTeachers.length)];
-
-        if (randomTeacher) {
-          const student: Student = {
-            id: randomUUID(),
-            name: studentData.name,
-            age: studentData.age,
-            level: studentData.level,
-            teacherId: randomTeacher.id,
-            phone: null,
-            createdAt: new Date(),
-          };
-          this.students.set(student.id, student);
-        }
-      });
-    }
+    // No sample students - will be managed through Firebase
   }
 
   // Teachers
@@ -261,8 +228,8 @@ export class MemStorage implements IStorage {
 
 }
 
-// استخدام MemStorage مؤقتاً حتى يتم تفعيل Firebase Firestore
+// استخدام MemStorage مؤقتاً حتى يتم تفعيل Firestore API
 export const storage = new MemStorage();
 
-// لاستخدام Firebase، قم بتفعيل Firestore API أولاً ثم استخدم:
+// لاستخدام Firebase بعد تفعيل Firestore API، استخدم:
 // export const storage = new FirebaseStorage();
