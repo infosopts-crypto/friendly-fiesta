@@ -28,11 +28,12 @@ The application follows a modern full-stack architecture with clear separation b
 - **Build Tool**: ESBuild for production builds
 
 ### Data Storage Architecture
-- **ORM**: Drizzle ORM with PostgreSQL dialect
-- **Database**: Supabase PostgreSQL (configured via DATABASE_URL)
-- **Migrations**: Drizzle Kit for schema management
-- **Cloud Database**: Supabase for production-ready database hosting
-- **Development Storage**: In-memory storage implementation for development/testing
+- **Primary Storage**: Firebase Firestore (cloud NoSQL database)
+- **Development Storage**: In-memory storage implementation (current fallback)
+- **Authentication**: Simple password-based authentication system
+- **Real-time Features**: Firebase Firestore real-time listeners support
+- **Offline Support**: Firestore offline persistence capabilities
+- **Backup Options**: PostgreSQL/Supabase integration available as alternative
 
 ## Key Components
 

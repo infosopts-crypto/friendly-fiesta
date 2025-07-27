@@ -1,6 +1,7 @@
 import { type Teacher, type InsertTeacher, type Student, type InsertStudent, type DailyRecord, type InsertDailyRecord, type QuranError, type InsertQuranError } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { DatabaseStorage } from "./db";
+import { FirebaseStorage } from "./firebase-storage";
 
 export interface IStorage {
   // Teachers
@@ -221,7 +222,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-// استخدام قاعدة البيانات الحقيقية بدلاً من الذاكرة المؤقتة
-export const storage = process.env.NODE_ENV === 'development' && !process.env.DATABASE_URL 
-  ? new MemStorage() 
-  : new DatabaseStorage();
+// استخدام MemStorage مؤقتاً حتى يتم تفعيل Firebase Firestore
+export const storage = new MemStorage();
+
+// لاستخدام Firebase، قم بتفعيل Firestore API أولاً ثم استخدم:
+// export const storage = new FirebaseStorage();
