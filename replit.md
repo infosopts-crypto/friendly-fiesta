@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a comprehensive web application for managing Quran memorization circles (حلقات القرآن) built for Jamae Al-Ruwaishid (جامع الرويشد). The system supports two main user types: teachers who manage students and track progress, and parents who can view their children's evaluations and records. It features gender-separated learning environments for male and female students with appropriate theming and full Arabic RTL language support.
+This is a comprehensive web application for managing Quran memorization circles (حلقات القرآن) built for Jamae Al-Ruwaishid (جامع الرويشد). The system is designed exclusively for teachers to manage students and track their Quran memorization progress. It features gender-separated learning environments for male and female students with appropriate theming and full Arabic RTL language support.
 
 ## User Preferences
 
@@ -38,18 +38,17 @@ The application follows a modern full-stack architecture with clear separation b
 ## Key Components
 
 ### Authentication System
-- Dual authentication system supporting teachers and parents
-- Role-based access control with user type selection
+- Teacher-only authentication system
 - Gender-based theming (men's vs women's circles)
 - Session persistence via localStorage
-- Secure credential management for both user types
+- Secure credential management
 
-### Parent Portal System (NEW)
-- Dedicated parent dashboard for monitoring children's progress
-- Real-time synchronization with teacher records
-- Multi-child support for families with multiple students
-- Comprehensive statistics and performance analytics
-- Recent activity tracking and behavioral assessments
+## Recent Changes (January 2025)
+- **Removed parent portal functionality** - System now exclusively for teachers per user request
+- Cleaned up authentication to support teachers only
+- Removed parent-related database tables and API endpoints
+- Updated UI to remove parent login options
+- Streamlined codebase for teacher-only access
 
 ### Student Management
 - CRUD operations for student records
