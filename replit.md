@@ -43,12 +43,14 @@ The application follows a modern full-stack architecture with clear separation b
 - Session persistence via localStorage
 - Secure credential management
 
-## Recent Changes (January 2025)
-- **Removed parent portal functionality** - System now exclusively for teachers per user request
-- Cleaned up authentication to support teachers only
-- Removed parent-related database tables and API endpoints
-- Updated UI to remove parent login options
-- Streamlined codebase for teacher-only access
+## Recent Changes (July 2025)
+- **Created comprehensive home page** with separate teacher and parent portals
+- **Added parent portal** for public viewing of all students without authentication  
+- **Integrated Firebase Firestore** as primary database (currently using memory storage as fallback)
+- **Added all 13 teachers** with standardized credentials (username/password: 123456)
+- **Populated system with sample students** across male and female circles
+- **Added developer footer** with attribution to عبدالله بن محمد and Telegram link
+- **Complete system ready for deployment** with full Arabic RTL support
 
 ### Student Management
 - CRUD operations for student records

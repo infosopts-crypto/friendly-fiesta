@@ -233,8 +233,8 @@ export class MemStorage implements IStorage {
 
 }
 
-// استخدام Firebase Firestore كقاعدة البيانات الأساسية
-export const storage = new FirebaseStorage();
+// استخدام MemStorage مؤقتاً حتى يتم حل مشكلة Firebase Firestore
+export const storage = new MemStorage();
 
-// للعودة إلى MemStorage في حالة وجود مشكلة، استخدم:
-// export const storage = new MemStorage();
+// للعودة إلى Firebase بعد حل المشكلة، استخدم:
+// export const storage = new FirebaseStorage();
