@@ -1,4 +1,4 @@
-import { type Teacher, type InsertTeacher, type Parent, type InsertParent, type Student, type InsertStudent, type DailyRecord, type InsertDailyRecord, type QuranError, type InsertQuranError } from "@shared/schema";
+import { type Teacher, type InsertTeacher, type Student, type InsertStudent, type DailyRecord, type InsertDailyRecord, type QuranError, type InsertQuranError } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { DatabaseStorage } from "./db";
 import { FirebaseStorage } from "./firebase-storage";
@@ -9,15 +9,9 @@ export interface IStorage {
   getTeacherByUsername(username: string): Promise<Teacher | undefined>;
   createTeacher(teacher: InsertTeacher): Promise<Teacher>;
   
-  // Parents
-  getParent(id: string): Promise<Parent | undefined>;
-  getParentByUsername(username: string): Promise<Parent | undefined>;
-  createParent(parent: InsertParent): Promise<Parent>;
-  
   // Students
   getStudent(id: string): Promise<Student | undefined>;
   getStudentsByTeacher(teacherId: string): Promise<Student[]>;
-  getStudentsByParent(parentId: string): Promise<Student[]>;
   createStudent(student: InsertStudent): Promise<Student>;
   updateStudent(id: string, student: Partial<InsertStudent>): Promise<Student | undefined>;
   deleteStudent(id: string): Promise<boolean>;
@@ -37,19 +31,16 @@ export interface IStorage {
   
   // Authentication
   validateTeacher(username: string, password: string): Promise<Teacher | null>;
-  validateParent(username: string, password: string): Promise<Parent | null>;
 }
 
 export class MemStorage implements IStorage {
   private teachers: Map<string, Teacher>;
-  private parents: Map<string, Parent>;
   private students: Map<string, Student>;
   private dailyRecords: Map<string, DailyRecord>;
   private quranErrors: Map<string, QuranError>;
 
   constructor() {
     this.teachers = new Map();
-    this.parents = new Map();
     this.students = new Map();
     this.dailyRecords = new Map();
     this.quranErrors = new Map();
@@ -89,56 +80,33 @@ export class MemStorage implements IStorage {
       this.teachers.set(teacher.id, teacher);
     });
 
-    // Sample parents
-    const sampleParents = [
-      { username: "parent1", password: "123456", fatherName: "أحمد محمد الأحمد", motherName: "فاطمة علي", phone: "0505123456", email: "ahmed@example.com" },
-      { username: "parent2", password: "123456", fatherName: "محمد عبدالله السعد", motherName: "عائشة يوسف", phone: "0505234567", email: "mohammed@example.com" },
-      { username: "parent3", password: "123456", fatherName: "علي حسن الخالد", motherName: "خديجة أحمد", phone: "0505345678", email: "ali@example.com" },
-      { username: "parent4", password: "123456", fatherName: "يوسف إبراهيم النور", motherName: "زينب محمد", phone: "0505456789", email: "youssef@example.com" },
-      { username: "parent5", password: "123456", fatherName: "عبدالرحمن صالح الريس", motherName: "أم كلثوم", phone: "0505567890", email: "abdulrahman@example.com" },
-    ];
-
-    sampleParents.forEach(parentData => {
-      const parent: Parent = {
-        ...parentData,
-        id: randomUUID(),
-        createdAt: new Date(),
-        email: parentData.email || null,
-        motherName: parentData.motherName || null,
-      };
-      this.parents.set(parent.id, parent);
-    });
-
-    // Sample students with parent connections
+    // Sample students
     const teachersArray = Array.from(this.teachers.values());
-    const parentsArray = Array.from(this.parents.values());
     
-    if (teachersArray.length > 0 && parentsArray.length > 0) {
+    if (teachersArray.length > 0) {
       const sampleStudents = [
-        { name: "عبدالله أحمد", age: 8, level: "beginner", parentIndex: 0, teacherGender: "male" },
-        { name: "فاطمة أحمد", age: 10, level: "intermediate", parentIndex: 0, teacherGender: "female" },
-        { name: "محمد عبدالله", age: 12, level: "advanced", parentIndex: 1, teacherGender: "male" },
-        { name: "عائشة محمد", age: 9, level: "beginner", parentIndex: 1, teacherGender: "female" },
-        { name: "علي حسن", age: 11, level: "intermediate", parentIndex: 2, teacherGender: "male" },
-        { name: "خديجة علي", age: 7, level: "beginner", parentIndex: 2, teacherGender: "female" },
-        { name: "يوسف إبراهيم", age: 13, level: "advanced", parentIndex: 3, teacherGender: "male" },
-        { name: "زينب يوسف", age: 8, level: "beginner", parentIndex: 3, teacherGender: "female" },
-        { name: "عبدالرحمن صالح", age: 10, level: "intermediate", parentIndex: 4, teacherGender: "male" },
+        { name: "عبدالله أحمد", age: 8, level: "beginner", teacherGender: "male" },
+        { name: "فاطمة أحمد", age: 10, level: "intermediate", teacherGender: "female" },
+        { name: "محمد عبدالله", age: 12, level: "advanced", teacherGender: "male" },
+        { name: "عائشة محمد", age: 9, level: "beginner", teacherGender: "female" },
+        { name: "علي حسن", age: 11, level: "intermediate", teacherGender: "male" },
+        { name: "خديجة علي", age: 7, level: "beginner", teacherGender: "female" },
+        { name: "يوسف إبراهيم", age: 13, level: "advanced", teacherGender: "male" },
+        { name: "زينب يوسف", age: 8, level: "beginner", teacherGender: "female" },
+        { name: "عبدالرحمن صالح", age: 10, level: "intermediate", teacherGender: "male" },
       ];
 
       sampleStudents.forEach(studentData => {
         const availableTeachers = teachersArray.filter(t => t.gender === studentData.teacherGender);
         const randomTeacher = availableTeachers[Math.floor(Math.random() * availableTeachers.length)];
-        const parent = parentsArray[studentData.parentIndex];
 
-        if (randomTeacher && parent) {
+        if (randomTeacher) {
           const student: Student = {
             id: randomUUID(),
             name: studentData.name,
             age: studentData.age,
             level: studentData.level,
             teacherId: randomTeacher.id,
-            parentId: parent.id,
             phone: null,
             createdAt: new Date(),
           };
@@ -168,27 +136,7 @@ export class MemStorage implements IStorage {
     return teacher;
   }
 
-  // Parents
-  async getParent(id: string): Promise<Parent | undefined> {
-    return this.parents.get(id);
-  }
 
-  async getParentByUsername(username: string): Promise<Parent | undefined> {
-    return Array.from(this.parents.values()).find(parent => parent.username === username);
-  }
-
-  async createParent(insertParent: InsertParent): Promise<Parent> {
-    const id = randomUUID();
-    const parent: Parent = { 
-      ...insertParent, 
-      id,
-      createdAt: new Date(),
-      email: insertParent.email || null,
-      motherName: insertParent.motherName || null,
-    };
-    this.parents.set(id, parent);
-    return parent;
-  }
 
   // Students
   async getStudent(id: string): Promise<Student | undefined> {
@@ -199,10 +147,6 @@ export class MemStorage implements IStorage {
     return Array.from(this.students.values()).filter(student => student.teacherId === teacherId);
   }
 
-  async getStudentsByParent(parentId: string): Promise<Student[]> {
-    return Array.from(this.students.values()).filter(student => student.parentId === parentId);
-  }
-
   async createStudent(insertStudent: InsertStudent): Promise<Student> {
     const id = randomUUID();
     const student: Student = { 
@@ -210,7 +154,6 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date(),
       phone: insertStudent.phone || null,
-      parentId: insertStudent.parentId || null,
     };
     this.students.set(id, student);
     return student;
@@ -315,13 +258,7 @@ export class MemStorage implements IStorage {
     return null;
   }
 
-  async validateParent(username: string, password: string): Promise<Parent | null> {
-    const parent = await this.getParentByUsername(username);
-    if (parent && parent.password === password) {
-      return parent;
-    }
-    return null;
-  }
+
 }
 
 // استخدام MemStorage مؤقتاً حتى يتم تفعيل Firebase Firestore

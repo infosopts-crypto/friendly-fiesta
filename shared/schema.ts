@@ -13,17 +13,6 @@ export const teachers = pgTable("teachers", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const parents = pgTable("parents", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  fatherName: text("father_name").notNull(),
-  motherName: text("mother_name"),
-  phone: text("phone").notNull(),
-  email: text("email"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
 export const students = pgTable("students", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
@@ -31,7 +20,6 @@ export const students = pgTable("students", {
   phone: text("phone"),
   level: text("level").notNull(), // 'beginner', 'intermediate', 'advanced'
   teacherId: varchar("teacher_id").references(() => teachers.id).notNull(),
-  parentId: varchar("parent_id").references(() => parents.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -83,11 +71,6 @@ export const insertTeacherSchema = createInsertSchema(teachers).omit({
   createdAt: true,
 });
 
-export const insertParentSchema = createInsertSchema(parents).omit({
-  id: true,
-  createdAt: true,
-});
-
 export const insertStudentSchema = createInsertSchema(students).omit({
   id: true,
   createdAt: true,
@@ -112,8 +95,6 @@ export const loginSchema = z.object({
 // Types
 export type Teacher = typeof teachers.$inferSelect;
 export type InsertTeacher = z.infer<typeof insertTeacherSchema>;
-export type Parent = typeof parents.$inferSelect;
-export type InsertParent = z.infer<typeof insertParentSchema>;
 export type Student = typeof students.$inferSelect;
 export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type DailyRecord = typeof dailyRecords.$inferSelect;

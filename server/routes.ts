@@ -7,26 +7,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { username, password, userType } = req.body;
-      const loginData = loginSchema.parse({ username, password });
+      const { username, password } = loginSchema.parse(req.body);
+      const teacher = await storage.validateTeacher(username, password);
       
-      if (userType === "parent") {
-        const parent = await storage.validateParent(loginData.username, loginData.password);
-        if (!parent) {
-          return res.status(401).json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
-        }
-        // Return parent data without password
-        const { password: _, ...parentData } = parent;
-        res.json({ ...parentData, userType: "parent" });
-      } else {
-        const teacher = await storage.validateTeacher(loginData.username, loginData.password);
-        if (!teacher) {
-          return res.status(401).json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
-        }
-        // Return teacher data without password
-        const { password: _, ...teacherData } = teacher;
-        res.json({ ...teacherData, userType: "teacher" });
+      if (!teacher) {
+        return res.status(401).json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
       }
+
+      // Return teacher data without password
+      const { password: _, ...teacherData } = teacher;
+      res.json(teacherData);
     } catch (error) {
       res.status(400).json({ message: "بيانات غير صالحة" });
     }
