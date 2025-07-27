@@ -10,12 +10,68 @@ import {
   where,
   serverTimestamp
 } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "./firebase-config";
 import type { Teacher, InsertTeacher, Student, InsertStudent, DailyRecord, InsertDailyRecord, QuranError, InsertQuranError } from "../shared/schema";
 import type { IStorage } from "./storage";
 import { randomUUID } from "crypto";
 
 export class FirebaseStorage implements IStorage {
+  
+  constructor() {
+    // تهيئة البيانات الأساسية عند إنشاء الكائن
+    this.initializeBasicData();
+  }
+
+  private async initializeBasicData() {
+    try {
+      // التحقق من وجود المعلمين، وإضافتهم إذا لم يكونوا موجودين
+      const teachersCollection = collection(db, "teachers");
+      const teachersSnapshot = await getDocs(teachersCollection);
+      
+      if (teachersSnapshot.empty) {
+        console.log("🕌 جاري إضافة المعلمين الأساسيين إلى Firebase...");
+        await this.addDefaultTeachers();
+        console.log("✅ تم إضافة جميع المعلمين بنجاح");
+      } else {
+        console.log("🟢 المعلمون موجودون بالفعل في Firebase");
+      }
+    } catch (error) {
+      console.error("❌ خطأ في تهيئة البيانات الأساسية:", error);
+      console.log("⚠️ سيتم استخدام البيانات المحلية كبديل");
+    }
+  }
+
+  private async addDefaultTeachers() {
+    // المعلمين للحلقات الرجالية
+    const menTeachers = [
+      { username: "abdalrazaq", password: "123456", name: "أ. عبدالرزاق", gender: "male", circleName: "حلقة عبدالرزاق" },
+      { username: "ibrahim", password: "123456", name: "أ. إبراهيم كدوائي", gender: "male", circleName: "حلقة إبراهيم كدوائي" },
+      { username: "hassan", password: "123456", name: "أ. حسن", gender: "male", circleName: "حلقة حسن" },
+      { username: "saud", password: "123456", name: "أ. سعود", gender: "male", circleName: "حلقة سعود" },
+      { username: "saleh", password: "123456", name: "أ. صالح", gender: "male", circleName: "حلقة صالح" },
+      { username: "abdullah", password: "123456", name: "أ. عبدالله", gender: "male", circleName: "حلقة عبدالله" },
+      { username: "nabil", password: "123456", name: "أ. نبيل", gender: "male", circleName: "حلقة نبيل" },
+    ];
+
+    // المعلمات للحلقات النسائية
+    const womenTeachers = [
+      { username: "asma", password: "123456", name: "أ. أسماء", gender: "female", circleName: "حلقة أسماء" },
+      { username: "raghad", password: "123456", name: "أ. رغد", gender: "female", circleName: "حلقة رغد" },
+      { username: "madina", password: "123456", name: "أ. مدينة", gender: "female", circleName: "حلقة مدينة" },
+      { username: "nashwa", password: "123456", name: "أ. نشوة", gender: "female", circleName: "حلقة نشوة" },
+      { username: "nour", password: "123456", name: "أ. نور", gender: "female", circleName: "حلقة نور" },
+      { username: "hind", password: "123456", name: "أ. هند", gender: "female", circleName: "حلقة هند" },
+    ];
+
+    const allTeachers = [...menTeachers, ...womenTeachers];
+    
+    for (const teacherData of allTeachers) {
+      await addDoc(collection(db, "teachers"), {
+        ...teacherData,
+        createdAt: serverTimestamp()
+      });
+    }
+  }
   
   // Teachers
   async getTeacher(id: string): Promise<Teacher | undefined> {
@@ -57,6 +113,16 @@ export class FirebaseStorage implements IStorage {
     } catch (error) {
       console.error("Error creating teacher:", error);
       throw error;
+    }
+  }
+
+  async getAllTeachers(): Promise<Teacher[]> {
+    try {
+      const querySnapshot = await getDocs(collection(db, "teachers"));
+      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Teacher));
+    } catch (error) {
+      console.error("Error getting all teachers:", error);
+      return [];
     }
   }
 

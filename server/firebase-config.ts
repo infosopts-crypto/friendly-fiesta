@@ -1,0 +1,21 @@
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
+// إعداد Firebase للخادم (server-side)
+const firebaseConfig = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY || "AIzaSyAUoJzErKsftcfHl4EJOwjHtyTt7nzgnDU",
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "rwesh-98a7b.firebaseapp.com",
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || "rwesh-98a7b",
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "rwesh-98a7b.firebasestorage.app",
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "598454381855",
+  appId: process.env.VITE_FIREBASE_APP_ID || "1:598454381855:web:1880dc56eff39e0a8e542a",
+  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID || "G-ES4RHGLQ7C"
+};
+
+// Initialize Firebase للخادم
+const app = initializeApp(firebaseConfig);
+
+// Initialize Firestore
+export const db = getFirestore(app);
+
+export default app;

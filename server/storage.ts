@@ -7,6 +7,7 @@ export interface IStorage {
   // Teachers
   getTeacher(id: string): Promise<Teacher | undefined>;
   getTeacherByUsername(username: string): Promise<Teacher | undefined>;
+  getAllTeachers(): Promise<Teacher[]>;
   createTeacher(teacher: InsertTeacher): Promise<Teacher>;
   
   // Students
@@ -93,7 +94,7 @@ export class MemStorage implements IStorage {
     return Array.from(this.teachers.values()).find(teacher => teacher.username === username);
   }
 
-  async getTeachers(): Promise<Teacher[]> {
+  async getAllTeachers(): Promise<Teacher[]> {
     return Array.from(this.teachers.values());
   }
 
@@ -237,8 +238,8 @@ export class MemStorage implements IStorage {
 
 }
 
-// استخدام MemStorage مؤقتاً حتى يتم حل مشكلة Firebase Firestore
-export const storage = new MemStorage();
+// تفعيل Firebase Firestore
+export const storage = new FirebaseStorage();
 
-// للعودة إلى Firebase بعد حل المشكلة، استخدم:
-// export const storage = new FirebaseStorage();
+// للعودة إلى MemStorage في حالة وجود مشكلة، استخدم:
+// export const storage = new MemStorage();

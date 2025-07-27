@@ -42,7 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all teachers (for testing and parent portal)
   app.get("/api/teachers", async (req, res) => {
     try {
-      const teachers = await storage.getTeachers();
+      const teachers = await storage.getAllTeachers();
       // Remove passwords from response
       const safeTeachers = teachers.map((teacher: any) => {
         const { password, ...safeTeacher } = teacher;
