@@ -5,6 +5,10 @@ export async function initializeTeachers() {
   try {
     console.log("🚀 بدء تهيئة المعلمين...");
     
+    // Check current teachers count first
+    const existingTeachers = await storage.getAllTeachers();
+    console.log(`📊 معلمين موجودين حالياً: ${existingTeachers.length}`);
+    
     // المعلمين للحلقات الرجالية
     const menTeachers = [
       { username: "abdalrazaq", password: "123456", name: "أ. عبدالرزاق", gender: "male", circleName: "حلقة عبدالرزاق" },
