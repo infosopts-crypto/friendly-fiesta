@@ -238,8 +238,8 @@ export class MemStorage implements IStorage {
 
 }
 
-// تفعيل Firebase Firestore
-export const storage = new FirebaseStorage();
+// استخدام MemStorage مع Firebase كنسخة احتياطية
+export const storage = new MemStorage();
 
-// للعودة إلى MemStorage في حالة وجود مشكلة، استخدم:
-// export const storage = new MemStorage();
+// نسخة Firebase للاستخدام المستقبلي عند حل مشاكل الاتصال
+// export const storage = new FirebaseStorage();

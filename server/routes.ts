@@ -148,6 +148,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/teachers/:teacherId/records", async (req, res) => {
+    try {
+      const { teacherId } = req.params;
+      const recordData = insertDailyRecordSchema.parse({ ...req.body, teacherId });
+      const record = await storage.createDailyRecord(recordData);
+      res.status(201).json(record);
+    } catch (error) {
+      res.status(400).json({ message: "خطأ في إضافة السجل اليومي" });
+    }
+  });
+
   app.post("/api/records", async (req, res) => {
     try {
       const recordData = insertDailyRecordSchema.parse(req.body);
