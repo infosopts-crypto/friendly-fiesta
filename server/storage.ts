@@ -11,6 +11,7 @@ export interface IStorage {
   
   // Students
   getStudent(id: string): Promise<Student | undefined>;
+  getAllStudents(): Promise<Student[]>;
   getStudentsByTeacher(teacherId: string): Promise<Student[]>;
   createStudent(student: InsertStudent): Promise<Student>;
   updateStudent(id: string, student: Partial<InsertStudent>): Promise<Student | undefined>;
@@ -108,6 +109,10 @@ export class MemStorage implements IStorage {
   // Students
   async getStudent(id: string): Promise<Student | undefined> {
     return this.students.get(id);
+  }
+
+  async getAllStudents(): Promise<Student[]> {
+    return Array.from(this.students.values());
   }
 
   async getStudentsByTeacher(teacherId: string): Promise<Student[]> {
@@ -228,8 +233,8 @@ export class MemStorage implements IStorage {
 
 }
 
-// استخدام MemStorage مؤقتاً حتى يتم تفعيل Firestore API
-export const storage = new MemStorage();
+// استخدام Firebase Firestore كقاعدة البيانات الأساسية
+export const storage = new FirebaseStorage();
 
-// لاستخدام Firebase بعد تفعيل Firestore API، استخدم:
-// export const storage = new FirebaseStorage();
+// للعودة إلى MemStorage في حالة وجود مشكلة، استخدم:
+// export const storage = new MemStorage();

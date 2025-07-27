@@ -75,14 +75,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Parent routes
-  app.get("/api/parents/:parentId/students", async (req, res) => {
+  // Public route to get all students (for parents portal)
+  app.get("/api/students", async (req, res) => {
     try {
-      const { parentId } = req.params;
-      const students = await storage.getStudentsByParent(parentId);
+      const students = await storage.getAllStudents();
       res.json(students);
     } catch (error) {
-      res.status(500).json({ message: "خطأ في جلب بيانات الأطفال" });
+      res.status(500).json({ message: "خطأ في جلب بيانات الطلاب" });
     }
   });
 

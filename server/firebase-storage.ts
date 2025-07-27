@@ -75,6 +75,16 @@ export class FirebaseStorage implements IStorage {
     }
   }
 
+  async getAllStudents(): Promise<Student[]> {
+    try {
+      const querySnapshot = await getDocs(collection(db, "students"));
+      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Student));
+    } catch (error) {
+      console.error("Error getting all students:", error);
+      return [];
+    }
+  }
+
   async getStudentsByTeacher(teacherId: string): Promise<Student[]> {
     try {
       const q = query(collection(db, "students"), where("teacherId", "==", teacherId));
