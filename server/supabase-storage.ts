@@ -469,11 +469,24 @@ export class SupabaseStorage implements IStorage {
   // Authentication
   async validateTeacher(username: string, password: string): Promise<Teacher | null> {
     try {
+      console.log(`🔍 Supabase: Validating teacher ${username} with password ${password}`);
       const teacher = await this.getTeacherByUsername(username);
-      if (teacher && teacher.password === password) {
-        return teacher;
+      
+      if (!teacher) {
+        console.log(`❌ Supabase: Teacher ${username} not found`);
+        return null;
       }
-      return null;
+      
+      console.log(`📝 Supabase: Found teacher ${teacher.name}, checking password...`);
+      console.log(`🔑 Supabase: Stored password: ${teacher.password}, provided: ${password}`);
+      
+      if (teacher && teacher.password === password) {
+        console.log(`✅ Supabase: Password match for ${teacher.name}`);
+        return teacher;
+      } else {
+        console.log(`❌ Supabase: Password mismatch for ${teacher.name}`);
+        return null;
+      }
     } catch (error) {
       console.error('Error validating teacher:', error);
       return null;

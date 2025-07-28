@@ -79,9 +79,10 @@ export class MemStorage implements IStorage {
         createdAt: new Date(),
       };
       this.teachers.set(teacher.id, teacher);
+      console.log(`📝 Initialized teacher: ${teacher.username} with password: ${teacher.password}`);
     });
 
-    // No sample students - will be managed through Firebase
+    console.log(`✅ MemStorage initialized with ${this.teachers.size} teachers`);
   }
 
   // Teachers

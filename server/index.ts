@@ -41,16 +41,23 @@ app.use((req, res, next) => {
   const server = await registerRoutes(app);
   
   // تهيئة المعلمين الأساسيين للتأكد من وجودهم - خاصة في الـ deployment
+  // تهيئة فورية للمعلمين
+  console.log("🚀 بدء تهيئة المعلمين...");
+  
+  try {
+    await initializeTeachers();
+    console.log("✅ Teachers initialization completed successfully");
+  } catch (error) {
+    console.error("❌ Teachers initialization failed:", error);
+  }
+  
+  // تهيئة إضافية بعد ثانية واحدة للتأكد
   setTimeout(async () => {
     try {
       await initializeTeachers();
-      console.log("✅ Teachers initialization completed successfully");
+      console.log("✅ Secondary teachers initialization completed");
     } catch (error) {
-      console.error("❌ Teachers initialization failed:", error);
-      // Re-try after 5 seconds if failed
-      setTimeout(() => {
-        initializeTeachers().catch(e => console.error("❌ Retry failed:", e));
-      }, 5000);
+      console.error("❌ Secondary teachers initialization failed:", error);
     }
   }, 1000);
 

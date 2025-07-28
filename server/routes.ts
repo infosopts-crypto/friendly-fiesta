@@ -16,15 +16,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (allTeachers.length === 0) {
         console.log("⚠️ No teachers found in storage, trying to create emergency teachers...");
-        // Try to create emergency teachers if none exist
-        const { ensureTeachersExist } = await import('./deployment-fix');
-        await ensureTeachersExist();
+        // Try to initialize teachers if none exist
+        const { initializeTeachers } = await import('./initialize-teachers');
+        await initializeTeachers();
+      }
+      
+      // التحقق من وجود المعلم بالاسم المستخدم
+      const teacherByUsername = await storage.getTeacherByUsername(username);
+      console.log(`🔍 Teacher found by username: ${teacherByUsername ? 'Yes' : 'No'}`);
+      
+      if (teacherByUsername) {
+        console.log(`📝 Teacher details: ${teacherByUsername.name}, password match: ${teacherByUsername.password === password}`);
       }
       
       const teacher = await storage.validateTeacher(username, password);
       
       if (!teacher) {
         console.log(`❌ Authentication failed for username: ${username}`);
+        console.log(`🔍 Available teachers: ${allTeachers.map(t => t.username).join(', ')}`);
         return res.status(401).json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
       }
 
