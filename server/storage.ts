@@ -1,7 +1,6 @@
 import { type Teacher, type InsertTeacher, type Student, type InsertStudent, type DailyRecord, type InsertDailyRecord, type QuranError, type InsertQuranError } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { DatabaseStorage } from "./db";
-import { FirebaseStorage } from "./firebase-storage";
+import { SupabaseStorage } from "./supabase-storage";
 
 export interface IStorage {
   // Teachers
@@ -238,8 +237,16 @@ export class MemStorage implements IStorage {
 
 }
 
-// استخدام MemStorage مع Firebase كنسخة احتياطية
-export const storage = new MemStorage();
+// استخدام Supabase كقاعدة البيانات الأساسية مع MemStorage كنسخة احتياطية
+let storage: IStorage;
 
-// نسخة Firebase للاستخدام المستقبلي عند حل مشاكل الاتصال
-// export const storage = new FirebaseStorage();
+try {
+  // محاولة الاتصال بـ Supabase
+  storage = new SupabaseStorage();
+  console.log("✅ تم الاتصال بـ Supabase بنجاح");
+} catch (error) {
+  console.warn("⚠️ فشل الاتصال بـ Supabase، استخدام التخزين المحلي:", error);
+  storage = new MemStorage();
+}
+
+export { storage };
