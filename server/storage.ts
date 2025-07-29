@@ -242,9 +242,14 @@ export class MemStorage implements IStorage {
 let storage: IStorage;
 
 try {
-  // محاولة الاتصال بـ Supabase
-  storage = new SupabaseStorage();
-  console.log("✅ تم الاتصال بـ Supabase بنجاح");
+  // التحقق من وجود DATABASE_URL قبل محاولة الاتصال بـ Supabase
+  if (process.env.DATABASE_URL) {
+    storage = new SupabaseStorage();
+    console.log("✅ تم الاتصال بـ Supabase بنجاح");
+  } else {
+    console.log("⚠️ DATABASE_URL غير موجود، استخدام التخزين المحلي");
+    storage = new MemStorage();
+  }
 } catch (error) {
   console.warn("⚠️ فشل الاتصال بـ Supabase، استخدام التخزين المحلي:", error);
   storage = new MemStorage();

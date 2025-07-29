@@ -9,6 +9,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { username, password } = loginSchema.parse(req.body);
       console.log(`🔍 Login attempt for username: ${username}`);
+      console.log(`🔍 Storage type: ${storage.constructor.name}`);
       
       // Check if any teachers exist first
       const allTeachers = await storage.getAllTeachers();
@@ -19,6 +20,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Try to initialize teachers if none exist
         const { initializeTeachers } = await import('./initialize-teachers');
         await initializeTeachers();
+        
+        // إعادة فحص المعلمين بعد التهيئة
+        const newTeachers = await storage.getAllTeachers();
+        console.log(`📊 Teachers after initialization: ${newTeachers.length}`);
       }
       
       // التحقق من وجود المعلم بالاسم المستخدم

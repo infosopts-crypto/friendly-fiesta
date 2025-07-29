@@ -5,6 +5,27 @@ export async function initializeTeachers() {
   try {
     console.log("🚀 بدء تهيئة المعلمين...");
     
+    // التحقق من نوع التخزين المستخدم
+    const isSupabase = storage.constructor.name === 'SupabaseStorage';
+    const isMemStorage = storage.constructor.name === 'MemStorage';
+    
+    console.log(`📊 نوع التخزين: ${storage.constructor.name}`);
+    
+    // إذا كان MemStorage، فالمعلمين موجودين بالفعل
+    if (isMemStorage) {
+      const existingTeachers = await storage.getAllTeachers();
+      if (existingTeachers.length >= 13) {
+        console.log(`✅ MemStorage: المعلمين موجودين بالفعل (${existingTeachers.length})`);
+        
+        // اختبار تسجيل الدخول
+        const testResult = await storage.validateTeacher("abdalrazaq", "123456");
+        if (testResult) {
+          console.log("✅ اختبار تسجيل الدخول ناجح");
+          return;
+        }
+      }
+    }
+    
     // المعلمين للحلقات الرجالية
     const menTeachers = [
       { username: "abdalrazaq", password: "123456", name: "أ. عبدالرزاق", gender: "male", circleName: "حلقة عبدالرزاق" },
